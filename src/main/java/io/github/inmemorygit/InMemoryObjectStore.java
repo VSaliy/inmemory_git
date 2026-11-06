@@ -5,7 +5,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.zip.DataFormatException;
@@ -22,6 +24,7 @@ import java.util.zip.Inflater;
  */
 public final class InMemoryObjectStore {
     private final Map<ObjectId, byte[]> objects = new HashMap<>();
+    public record FsckIssue(ObjectId id, String message) { }
 
     /** Stores an immutable object and returns its content-derived name. */
     public ObjectId put(ObjectType type, byte[] content) {
@@ -69,6 +72,23 @@ public final class InMemoryObjectStore {
 
     public int objectCount() {
         return objects.size();
+    }
+
+    /**
+     * Validates all stored objects by checking compressed-byte identity and object framing.
+     * This first-cut fsck verifies object-level integrity, not repository graph semantics.
+     */
+    public List<FsckIssue> fsck() {
+        List<FsckIssue> issues = new ArrayList<>();
+        objects.entrySet().stream().sorted(java.util.Comparator.comparing(entry -> entry.getKey().hex()))
+                .forEach(entry -> {
+                    try {
+                        decodeStoredObject(entry.getKey(), entry.getValue());
+                    } catch (RuntimeException exception) {
+                        issues.add(new FsckIssue(entry.getKey(), exception.getMessage()));
+                    }
+                });
+        return List.copyOf(issues);
     }
 
     private static DecodedObject decodeStoredObject(ObjectId id, byte[] compressed) {

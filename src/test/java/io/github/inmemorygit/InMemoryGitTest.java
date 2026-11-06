@@ -82,6 +82,7 @@ public final class InMemoryGitTest {
         check(store.checkObjectSignature(commit), "Commit signature should verify");
         equal(3, store.objectCount());
         check(store.contains(blob), "Stored object is present");
+        equal(List.of(), store.fsck());
     }
 
     @Test
