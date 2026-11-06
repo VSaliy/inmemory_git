@@ -280,6 +280,11 @@ public final class InMemoryGit {
         return object.type();
     }
 
+    /** Validate object-store framing and object-ID signatures. */
+    public List<InMemoryObjectStore.FsckIssue> fsckObjects() {
+        return objects.fsck();
+    }
+
     public int objectCount() { return objects.objectCount(); }
 
     /**

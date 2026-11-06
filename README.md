@@ -29,10 +29,12 @@ From this project directory, in PowerShell:
 # Maven
 ./mvnw.cmd clean verify
 ./mvnw.cmd compile exec:java
+./mvnw.cmd -Dexec.mainClass=io.github.inmemorygit.Cli -Dexec.args=fsck exec:java
 
 # Gradle
 ./gradlew.bat clean build
 ./gradlew.bat run
+./gradlew.bat fsckFixture
 ```
 
 On Linux or macOS:
@@ -41,10 +43,12 @@ On Linux or macOS:
 # Maven
 ./mvnw clean verify
 ./mvnw compile exec:java
+./mvnw -Dexec.mainClass=io.github.inmemorygit.Cli -Dexec.args=fsck exec:java
 
 # Gradle
 ./gradlew clean build
 ./gradlew run
+./gradlew fsckFixture
 ```
 
 Both builds compile UTF-8 sources with `--release 17 -Xlint:all -Werror` and run
@@ -64,8 +68,9 @@ java -jar build/libs/inmemory-git-1.0-SNAPSHOT.jar
 ```
 
 The existing convenience commands, `./scripts/run.ps1 test` or
-`sh scripts/run.sh test`, now use the Maven wrapper. They also accept `demo` and
-`all` (the default), with `all` running tests followed by the demo.
+`sh scripts/run.sh test`, now use the Maven wrapper. They also accept `demo`,
+`fsck`, and `all` (the default), with `all` running tests, the demo, and the
+fixture fsck check.
 
 ## What the original implemented
 

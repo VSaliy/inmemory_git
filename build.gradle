@@ -40,3 +40,11 @@ tasks.named('jar', Jar) {
         attributes('Main-Class': application.mainClass.get())
     }
 }
+
+tasks.register('fsckFixture', JavaExec) {
+    group = 'verification'
+    description = 'Builds a fixture repository and runs in-memory fsck checks.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'io.github.inmemorygit.Cli'
+    args 'fsck'
+}
