@@ -112,7 +112,7 @@ git.updateCache("src/hello.txt");
 var second = git.commitTree(git.writeTree(), List.of(first), who, who, "Update\n");
 git.readCommit(second).parents();          // [first]
 git.readTree(tree);                       // inspect without changing state
-git.restoreTree(tree);                    // explicitly replace working files + index
+git.unpackTree(tree);                     // explicitly replace working files + index
 ```
 
 To stage a deletion, call `removeFile(path)` and then `updateCache(path)`.
@@ -140,10 +140,11 @@ ambiguous paths and file/directory conflicts. Dates and messages are explicit;
 no host identity or clock is read. Messages are preserved exactly, including
 whether they end in a newline.
 
-`readTree` only inspects. The additional `restoreTree` operation replaces the
-**whole** working directory and index, including removal of untracked files;
-stored objects remain available. `showDiff` returns structured binary content
-and mode differences for tracked paths, without producing a text patch.
+`readTree` only inspects. `unpackTree` replaces the **whole** working directory
+and index, including removal of untracked files; stored objects remain
+available. `restoreTree` remains as a compatibility alias. `showDiff` returns
+structured binary content and mode differences for tracked paths, without
+producing a text patch.
 
 Repositories are single-threaded, process-local, bounded by available heap, and
 discarded when the instance is lost. There is no persistence, object pruning,

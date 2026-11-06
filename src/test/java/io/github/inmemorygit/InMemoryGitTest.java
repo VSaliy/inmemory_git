@@ -295,7 +295,7 @@ public final class InMemoryGitTest {
     }
 
     @Test
-    @DisplayName("restoration recreates staged bytes and modes")
+    @DisplayName("unpack-tree recreates staged bytes and modes")
     void restoringTrees() {
         var git = new InMemoryGit();
         byte[] binary = new byte[] {0, 10, -1, 42};
@@ -307,7 +307,7 @@ public final class InMemoryGitTest {
         git.removeFile("bin/run");
         git.putText("extra", "extra");
         git.updateCache("notes", "bin/run", "extra");
-        git.restoreTree(saved);
+        git.unpackTree(saved);
         equal(saved, git.writeTree());
         bytes(binary, git.workingFile("bin/run").orElseThrow().content());
         equal(EXECUTABLE_FILE, git.workingFile("bin/run").orElseThrow().mode());
@@ -324,8 +324,10 @@ public final class InMemoryGitTest {
         var empty = new InMemoryGit();
         ObjectId emptyTree = empty.writeTree();
         empty.putText("remove-me", "x");
-        empty.restoreTree(emptyTree);
+        empty.unpackTree(emptyTree);
         equal(0, empty.workingDirectory().size());
+        git.restoreTree(saved);
+        equal(saved, git.writeTree());
     }
 
     @Test
@@ -349,7 +351,7 @@ public final class InMemoryGitTest {
         expect(IllegalArgumentException.class, () -> git.catFile(missing));
         expect(IllegalArgumentException.class, () -> git.readTree(blob));
         expect(IllegalArgumentException.class, () -> git.readCommit(blob));
-        expect(IllegalArgumentException.class, () -> git.restoreTree(blob));
+        expect(IllegalArgumentException.class, () -> git.unpackTree(blob));
         expect(IllegalArgumentException.class, () -> git.commitTree(blob, List.of(), AUTHOR, COMMITTER, "bad"));
         ObjectId tree = git.writeTree();
         expect(IllegalArgumentException.class, () -> git.commitTree(tree, List.of(blob), AUTHOR, COMMITTER, "bad"));

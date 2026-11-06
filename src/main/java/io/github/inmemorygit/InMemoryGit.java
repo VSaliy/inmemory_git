@@ -288,10 +288,10 @@ public final class InMemoryGit {
     }
 
     /**
-     * Convenience beyond the 2005 utilities: replace the complete working directory
-     * and index with a tree. Existing untracked files are also removed. Objects survive.
+     * Replace the complete working directory and index with a tree.
+     * Existing untracked files are also removed. Objects survive.
      */
-    public void restoreTree(ObjectId tree) {
+    public void unpackTree(ObjectId tree) {
         List<TreeEntry> entries = readTree(tree);
         NavigableMap<String, WorkingFile> restored = new TreeMap<>(PATH_ORDER);
         for (TreeEntry entry : entries) {
@@ -303,6 +303,14 @@ public final class InMemoryGit {
         for (TreeEntry entry : entries) {
             index.put(entry.path(), new IndexEntry(entry.path(), entry.mode(), entry.objectId()));
         }
+    }
+
+    /**
+     * Compatibility alias for callers using the previous adaptation name.
+     * This delegates to {@link #unpackTree(ObjectId)}.
+     */
+    public void restoreTree(ObjectId tree) {
+        unpackTree(tree);
     }
 
     private GitObject requireObject(ObjectId id, ObjectType expected) {

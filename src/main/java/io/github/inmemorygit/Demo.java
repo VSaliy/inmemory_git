@@ -36,7 +36,7 @@ public final class Demo {
         }
         System.out.println("Stored objects: " + git.objectCount() + " (the unchanged note blob is shared)");
 
-        git.restoreTree(firstTree);
+        git.unpackTree(firstTree);
         System.out.print("Restored greeting: " + new String(git.workingFile("hello.txt").orElseThrow().content(),
                 StandardCharsets.UTF_8));
         System.out.println("All repository state lived in Java memory.");
