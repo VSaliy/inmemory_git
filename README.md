@@ -7,6 +7,15 @@ The working directory, index, and object database are Java collections. Creating
 and using a repository never reads or writes files, runs Git, or starts a process.
 Maven and Gradle builds use the same Java sources and JUnit test suite.
 
+## Attribution and copyright notices
+
+This repository contains an original Java implementation. It is intentionally
+based on the public behavior and formats from early Git source code and links
+to exact upstream commits for historical reference. Original Git is copyrighted
+by its contributors and distributed under GPL-2.0. See the upstream project at
+https://github.com/git/git and the corresponding source references in
+[`docs/HISTORICAL_REFERENCE.md`](docs/HISTORICAL_REFERENCE.md).
+
 ## Build and run
 
 Install a JDK 17 or newer and choose either build tool. The included wrappers
