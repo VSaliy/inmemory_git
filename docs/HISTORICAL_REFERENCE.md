@@ -170,6 +170,13 @@ caller's history handles. Stored byte arrays are protected from caller
 mutation so that returning or editing data cannot silently rewrite an older
 snapshot.
 
+## Build strictness note
+
+Soon after the initial revision, upstream tightened C compilation flags
+(`-Wall -O2`). The Java adaptation keeps the equivalent "treat warnings as
+failures" stance in both Maven and Gradle (`-Xlint:all -Werror`) so behavioral
+changes are not hidden behind new compiler warnings.
+
 This is a historical format adaptation, not a claim of interchangeability
 with modern Git or of identical compression output across every runtime. Since
 the compressed representation participates in identity, different zlib
