@@ -121,6 +121,7 @@ public final class InMemoryGit {
 
     /** The working value is null for a deletion; the indexed value is always present. */
     public record DiffEntry(String path, ChangeType kind, WorkingFile indexed, WorkingFile working) { }
+    public record FsckIssue(ObjectId id, String message) { }
 
     public void putText(String path, String text) { putFile(path, utf8(text)); }
 
@@ -283,6 +284,27 @@ public final class InMemoryGit {
     /** Validate object-store framing and object-ID signatures. */
     public List<InMemoryObjectStore.FsckIssue> fsckObjects() {
         return objects.fsck();
+    }
+
+    /** Validate object-store integrity plus tree/commit format and cross-object references. */
+    public List<FsckIssue> fsckRepository() {
+        List<FsckIssue> issues = new ArrayList<>();
+        for (InMemoryObjectStore.FsckIssue issue : objects.fsck()) {
+            issues.add(new FsckIssue(issue.id(), issue.message()));
+        }
+        for (ObjectId id : objects.objectIds()) {
+            try {
+                ObjectType type = objects.get(id).type();
+                if (type == ObjectType.TREE) {
+                    readTree(id);
+                } else if (type == ObjectType.COMMIT) {
+                    readCommit(id);
+                }
+            } catch (RuntimeException exception) {
+                issues.add(new FsckIssue(id, exception.getMessage()));
+            }
+        }
+        return List.copyOf(issues);
     }
 
     public int objectCount() { return objects.objectCount(); }

@@ -25,10 +25,10 @@ public final class Cli {
         git.updateCache("hello.txt");
         ObjectId tree = git.writeTree();
         git.commitTree(tree, List.of(), who, who, "fixture\n");
-        List<InMemoryObjectStore.FsckIssue> issues = git.fsckObjects();
+        List<InMemoryGit.FsckIssue> issues = git.fsckRepository();
         if (!issues.isEmpty()) {
             StringBuilder message = new StringBuilder("fsck failed:");
-            for (InMemoryObjectStore.FsckIssue issue : issues) {
+            for (InMemoryGit.FsckIssue issue : issues) {
                 message.append(System.lineSeparator()).append(issue.id()).append(" ").append(issue.message());
             }
             throw new IllegalStateException(message.toString());

@@ -74,6 +74,11 @@ public final class InMemoryObjectStore {
         return objects.size();
     }
 
+    /** Returns a sorted snapshot of object IDs currently present in this store. */
+    public List<ObjectId> objectIds() {
+        return objects.keySet().stream().sorted(java.util.Comparator.comparing(ObjectId::hex)).toList();
+    }
+
     /**
      * Validates all stored objects by checking compressed-byte identity and object framing.
      * This first-cut fsck verifies object-level integrity, not repository graph semantics.
@@ -181,8 +186,6 @@ public final class InMemoryObjectStore {
                 } else if (!inflater.finished()) {
                     throw new IllegalStateException("Object inflation made no progress");
                 }
-
-                private record DecodedObject(ObjectType type, byte[] payload) { }
             }
             if (inflater.getRemaining() != 0) {
                 throw new IllegalStateException("Trailing bytes after object compression stream");
@@ -194,4 +197,6 @@ public final class InMemoryObjectStore {
             inflater.end();
         }
     }
+
+    private record DecodedObject(ObjectType type, byte[] payload) { }
 }

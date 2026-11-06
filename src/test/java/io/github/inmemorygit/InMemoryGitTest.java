@@ -249,6 +249,7 @@ public final class InMemoryGitTest {
         bytes(utf8("one"), git.catFile(git.readTree(firstTree).get(0).objectId()).content());
         equal(first, git.commitTree(firstTree, List.of(), AUTHOR, COMMITTER, "initial\n"));
         equal(List.of(), git.fsckObjects());
+        equal(List.of(), git.fsckRepository());
         expect(UnsupportedOperationException.class, () -> git.readCommit(second).parents().clear());
     }
 
