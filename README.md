@@ -155,5 +155,7 @@ Repositories are single-threaded, process-local, bounded by available heap, and
 discarded when the instance is lost. There is no persistence, object pruning,
 symlink support, branch management, transport, or merge implementation. SHA-1
 and compressed-byte identity are retained for historical fidelity; output IDs
-can vary with compression implementations. This is an educational library, with
-no promise of modern Git interoperability.
+can vary with compression implementations. Compression uses Java's built-in zlib
+implementation (`java.util.zip`), the adaptation equivalent of the original
+linking against `-lz`. This is an educational library, with no promise of
+modern Git interoperability.

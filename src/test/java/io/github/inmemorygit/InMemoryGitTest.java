@@ -54,11 +54,14 @@ public final class InMemoryGitTest {
         new java.util.Random(2005).nextBytes(large);
         for (byte[] payload : List.of(new byte[0], new byte[] {0, 1, -1, 0}, utf8("café 🦊"), large)) {
             ObjectId id = store.put(ObjectType.BLOB, payload);
+            byte[] compressed = store.compressedBytes(id);
+            check(compressed.length > 2 && (compressed[0] & 0xff) == 0x78,
+                    "Objects should be stored in a zlib stream");
             GitObject object = store.get(id);
             equal(ObjectType.BLOB, object.type());
             equal(payload.length, object.size());
             bytes(payload, object.content());
-            try (var input = new InflaterInputStream(new ByteArrayInputStream(store.compressedBytes(id)))) {
+            try (var input = new InflaterInputStream(new ByteArrayInputStream(compressed))) {
                 byte[] header = utf8("blob " + payload.length + "\0");
                 byte[] actual = input.readAllBytes();
                 bytes(header, Arrays.copyOf(actual, header.length));
