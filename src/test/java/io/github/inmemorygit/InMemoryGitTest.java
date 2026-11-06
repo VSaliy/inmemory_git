@@ -258,6 +258,9 @@ public final class InMemoryGitTest {
                 + "\n\n" + message;
         equal(ObjectType.COMMIT, git.catFile(merge).type());
         bytes(utf8(expected), git.catFile(merge).content());
+        var streamed = new ByteArrayOutputStream();
+        equal(ObjectType.COMMIT, git.catFileTo(merge, streamed));
+        bytes(utf8(expected), streamed.toByteArray());
         var decoded = git.readCommit(merge);
         equal(List.of(a, b), decoded.parents());
         equal(AUTHOR, decoded.author());

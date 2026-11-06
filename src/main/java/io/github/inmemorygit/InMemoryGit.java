@@ -1,6 +1,9 @@
 package io.github.inmemorygit;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -264,6 +267,18 @@ public final class InMemoryGit {
 
     /** Return decoded bytes and type in memory, replacing cat-file's historical tempfile. */
     public GitObject catFile(ObjectId id) { return objects.get(id); }
+
+    /** Stream an object's payload to an output stream, analogous to cat-file stdout behavior. */
+    public ObjectType catFileTo(ObjectId id, OutputStream output) {
+        Objects.requireNonNull(output, "output");
+        GitObject object = catFile(id);
+        try {
+            output.write(object.content());
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Failed to write object payload", exception);
+        }
+        return object.type();
+    }
 
     public int objectCount() { return objects.objectCount(); }
 
