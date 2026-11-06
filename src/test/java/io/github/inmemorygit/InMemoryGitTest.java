@@ -43,6 +43,7 @@ public final class InMemoryGitTest {
         // Independently generated with Node's zlib level 9 and crypto SHA-1.
         equal("d1411423ff8cd2481a52ee2a96a999bf676d6242", id.hex());
         equal("78da4bcac94f523063c848cdc9c9e702001dc50414", HexFormat.of().formatHex(compressed));
+        check(store.checkObjectSignature(id), "Stored object signature should match its ID");
     }
 
     @Test
@@ -76,6 +77,9 @@ public final class InMemoryGitTest {
         ObjectId tree = store.put(ObjectType.TREE, utf8("same"));
         ObjectId commit = store.put(ObjectType.COMMIT, utf8("same"));
         check(!blob.equals(tree) && !blob.equals(commit) && !tree.equals(commit), "Type is part of identity");
+        check(store.checkObjectSignature(blob), "Blob signature should verify");
+        check(store.checkObjectSignature(tree), "Tree signature should verify");
+        check(store.checkObjectSignature(commit), "Commit signature should verify");
         equal(3, store.objectCount());
         check(store.contains(blob), "Stored object is present");
     }

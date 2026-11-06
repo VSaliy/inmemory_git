@@ -62,6 +62,11 @@ public final class InMemoryObjectStore {
         return objects.containsKey(Objects.requireNonNull(id, "id"));
     }
 
+    /** Checks whether the stored compressed bytes still match the addressed SHA-1 name. */
+    public boolean checkObjectSignature(ObjectId id) {
+        return hash(requireObject(id)).equals(id);
+    }
+
     public int objectCount() {
         return objects.size();
     }
