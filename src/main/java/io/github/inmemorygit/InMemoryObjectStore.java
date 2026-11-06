@@ -49,6 +49,24 @@ public final class InMemoryObjectStore {
      */
     public GitObject get(ObjectId id) {
         byte[] compressed = requireObject(id);
+        DecodedObject decoded = decodeStoredObject(id, compressed);
+        return new GitObject(decoded.type(), decoded.payload());
+    }
+
+    /** Returns a copy of the exact compressed bytes addressed by this ID. */
+    public byte[] compressedBytes(ObjectId id) {
+        return requireObject(id).clone();
+    }
+
+    public boolean contains(ObjectId id) {
+        return objects.containsKey(Objects.requireNonNull(id, "id"));
+    }
+
+    public int objectCount() {
+        return objects.size();
+    }
+
+    private static DecodedObject decodeStoredObject(ObjectId id, byte[] compressed) {
         if (!hash(compressed).equals(id)) {
             throw new IllegalStateException("Object identity mismatch: " + id);
         }
@@ -83,20 +101,7 @@ public final class InMemoryObjectStore {
         if (size != encoded.length - nul - 1) {
             throw new IllegalStateException("Object length does not match header");
         }
-        return new GitObject(type, Arrays.copyOfRange(encoded, nul + 1, encoded.length));
-    }
-
-    /** Returns a copy of the exact compressed bytes addressed by this ID. */
-    public byte[] compressedBytes(ObjectId id) {
-        return requireObject(id).clone();
-    }
-
-    public boolean contains(ObjectId id) {
-        return objects.containsKey(Objects.requireNonNull(id, "id"));
-    }
-
-    public int objectCount() {
-        return objects.size();
+        return new DecodedObject(type, Arrays.copyOfRange(encoded, nul + 1, encoded.length));
     }
 
     private byte[] requireObject(ObjectId id) {
@@ -151,6 +156,8 @@ public final class InMemoryObjectStore {
                 } else if (!inflater.finished()) {
                     throw new IllegalStateException("Object inflation made no progress");
                 }
+
+                private record DecodedObject(ObjectType type, byte[] payload) { }
             }
             if (inflater.getRemaining() != 0) {
                 throw new IllegalStateException("Trailing bytes after object compression stream");
